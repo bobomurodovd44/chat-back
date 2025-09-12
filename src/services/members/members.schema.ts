@@ -25,7 +25,7 @@ export const membersResolver = resolve<Members, HookContext<MembersService>>({})
 export const membersExternalResolver = resolve<Members, HookContext<MembersService>>({})
 
 // Schema for creating new entries
-export const membersDataSchema = Type.Pick(membersSchema, ['chatId', 'userId'], {
+export const membersDataSchema = Type.Pick(membersSchema, ['chatId', 'userId', 'role'], {
   $id: 'MembersData'
 })
 export type MembersData = Static<typeof membersDataSchema>

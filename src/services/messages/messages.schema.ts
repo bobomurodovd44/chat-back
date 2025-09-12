@@ -16,6 +16,10 @@ export const messageSchema = Type.Object(
     _id: ObjectIdSchema(),
     text: Type.String(),
     senderId: ObjectIdSchema(),
+    chatId: ObjectIdSchema(),
+    senderEmail: Type.Optional(Type.String()),
+    senderUserId: Type.Optional(Type.String()),
+    senderFullName: Type.Optional(Type.String()),
     createdAt: Type.Number(),
     updatedAt: Type.Number()
   },
@@ -28,7 +32,7 @@ export const messageResolver = resolve<Message, HookContext<MessageService>>({})
 export const messageExternalResolver = resolve<Message, HookContext<MessageService>>({})
 
 // Schema for creating new entries
-export const messageDataSchema = Type.Pick(messageSchema, ['text', 'senderId'], {
+export const messageDataSchema = Type.Pick(messageSchema, ['text', 'senderId', 'chatId'], {
   $id: 'MessageData'
 })
 export type MessageData = Static<typeof messageDataSchema>
@@ -53,6 +57,7 @@ export const messageQueryProperties = Type.Pick(messageSchema, [
   '_id',
   'text',
   'senderId',
+  'chatId',
   'createdAt',
   'updatedAt'
 ])

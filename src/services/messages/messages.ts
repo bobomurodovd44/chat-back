@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { MessageService, getOptions } from './messages.class'
 import { messagePath, messageMethods } from './messages.shared'
+import { HookContext } from '@feathersjs/feathers'
 
 export * from './messages.class'
 export * from './messages.schema'
@@ -43,7 +44,27 @@ export const message = (app: Application) => {
       all: [schemaHooks.validateQuery(messageQueryValidator), schemaHooks.resolveQuery(messageQueryResolver)],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(messageDataValidator), schemaHooks.resolveData(messageDataResolver)],
+      create: [
+        schemaHooks.validateData(messageDataValidator),
+        schemaHooks.resolveData(messageDataResolver),
+        async (context: HookContext) => {
+          const { data, app } = context
+
+          if (data.senderId) {
+            const member = await app.service('members').get(data.senderId)
+
+            const user = await app.service('users').get(member.userId)
+
+            data.senderEmail = user.email
+            data.senderFullName = user.fullName
+            data.senderUserId = user._id
+
+            context.data = data
+          }
+
+          return context
+        }
+      ],
       patch: [schemaHooks.validateData(messagePatchValidator), schemaHooks.resolveData(messagePatchResolver)],
       remove: []
     },
