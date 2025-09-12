@@ -13,7 +13,8 @@ export const membersSchema = Type.Object(
   {
     _id: ObjectIdSchema(),
     chatId: Type.String(),
-    userId: Type.String()
+    userId: Type.String(),
+    role: Type.Optional(Type.Union([Type.Literal('owner'), Type.Literal('member')]))
   },
   { $id: 'Members', additionalProperties: false }
 )
@@ -24,7 +25,7 @@ export const membersResolver = resolve<Members, HookContext<MembersService>>({})
 export const membersExternalResolver = resolve<Members, HookContext<MembersService>>({})
 
 // Schema for creating new entries
-export const membersDataSchema = Type.Pick(membersSchema, ['chatId'], {
+export const membersDataSchema = Type.Pick(membersSchema, ['chatId', 'userId'], {
   $id: 'MembersData'
 })
 export type MembersData = Static<typeof membersDataSchema>
@@ -40,7 +41,7 @@ export const membersPatchValidator = getValidator(membersPatchSchema, dataValida
 export const membersPatchResolver = resolve<Members, HookContext<MembersService>>({})
 
 // Schema for allowed query properties
-export const membersQueryProperties = Type.Pick(membersSchema, ['_id', 'chatId'])
+export const membersQueryProperties = Type.Pick(membersSchema, ['_id', 'chatId', 'userId'])
 export const membersQuerySchema = Type.Intersect(
   [
     querySyntax(membersQueryProperties),

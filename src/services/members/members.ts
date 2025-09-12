@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { MembersService, getOptions } from './members.class'
 import { membersPath, membersMethods } from './members.shared'
+import { HookContext } from '@feathersjs/feathers'
 
 export * from './members.class'
 export * from './members.schema'
@@ -43,7 +44,17 @@ export const members = (app: Application) => {
       all: [schemaHooks.validateQuery(membersQueryValidator), schemaHooks.resolveQuery(membersQueryResolver)],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(membersDataValidator), schemaHooks.resolveData(membersDataResolver)],
+      create: [
+        schemaHooks.validateData(membersDataValidator),
+        schemaHooks.resolveData(membersDataResolver),
+        async (context: HookContext) => {
+          if (!context.data.role) {
+            context.data.role = 'member'
+          }
+
+          return context
+        }
+      ],
       patch: [schemaHooks.validateData(membersPatchValidator), schemaHooks.resolveData(membersPatchResolver)],
       remove: []
     },
