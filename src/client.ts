@@ -4,6 +4,12 @@ import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
+import { groupsClient } from './services/groups/groups.shared'
+export type { Groups, GroupsData, GroupsQuery, GroupsPatch } from './services/groups/groups.shared'
+
+import { membersClient } from './services/members/members.shared'
+export type { Members, MembersData, MembersQuery, MembersPatch } from './services/members/members.shared'
+
 import { messageClient } from './services/messages/messages.shared'
 export type { Message, MessageData, MessageQuery, MessagePatch } from './services/messages/messages.shared'
 
@@ -38,5 +44,7 @@ export const createClient = <Configuration = any,>(
 
   client.configure(userClient)
   client.configure(messageClient)
+  client.configure(membersClient)
+  client.configure(groupsClient)
   return client
 }
