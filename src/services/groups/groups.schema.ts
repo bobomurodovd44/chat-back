@@ -12,7 +12,8 @@ import type { GroupsService } from './groups.class'
 export const groupsSchema = Type.Object(
   {
     _id: Type.String(),
-    name: Type.String()
+    name: Type.Optional(Type.String()),
+    type: Type.Optional(Type.Union([Type.Literal('private'), Type.Literal('group')]))
   },
   { $id: 'Groups', additionalProperties: false }
 )
@@ -23,7 +24,7 @@ export const groupsResolver = resolve<Groups, HookContext<GroupsService>>({})
 export const groupsExternalResolver = resolve<Groups, HookContext<GroupsService>>({})
 
 // Schema for creating new entries
-export const groupsDataSchema = Type.Pick(groupsSchema, ['name'], {
+export const groupsDataSchema = Type.Pick(groupsSchema, ['name', 'type'], {
   $id: 'GroupsData'
 })
 export type GroupsData = Static<typeof groupsDataSchema>
@@ -39,7 +40,7 @@ export const groupsPatchValidator = getValidator(groupsPatchSchema, dataValidato
 export const groupsPatchResolver = resolve<Groups, HookContext<GroupsService>>({})
 
 // Schema for allowed query properties
-export const groupsQueryProperties = Type.Pick(groupsSchema, ['_id', 'name'])
+export const groupsQueryProperties = Type.Pick(groupsSchema, ['_id', 'name', 'type'])
 export const groupsQuerySchema = Type.Intersect(
   [
     querySyntax(groupsQueryProperties),

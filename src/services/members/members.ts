@@ -18,6 +18,7 @@ import type { Application } from '../../declarations'
 import { MembersService, getOptions } from './members.class'
 import { membersPath, membersMethods } from './members.shared'
 import { HookContext } from '@feathersjs/feathers'
+import { BadRequest } from '@feathersjs/errors'
 
 export * from './members.class'
 export * from './members.schema'
@@ -48,8 +49,24 @@ export const members = (app: Application) => {
         schemaHooks.validateData(membersDataValidator),
         schemaHooks.resolveData(membersDataResolver),
         async (context: HookContext) => {
-          if (!context.data.role) {
-            context.data.role = 'member'
+          const { app, data } = context
+
+          // Default role
+          if (!data.role) {
+            data.role = 'member'
+          }
+
+          // Chat members ni olish
+          const chatMembers: any = await app.service('members').find({
+            query: { chatId: data.chatId }
+          })
+
+          // Guruhni olish
+          const chat: any = await app.service('groups').get(data.chatId)
+
+          // Agar private chat bo‘lsa va allaqachon 2+ odam bo‘lsa
+          if (chat.type === 'private' && chatMembers.total >= 2) {
+            throw new BadRequest('Private chat already has 2 members')
           }
 
           return context

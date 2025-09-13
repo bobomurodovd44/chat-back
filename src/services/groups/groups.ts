@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { GroupsService, getOptions } from './groups.class'
 import { groupsPath, groupsMethods } from './groups.shared'
+import { HookContext } from '@feathersjs/feathers'
 
 export * from './groups.class'
 export * from './groups.schema'
@@ -43,7 +44,19 @@ export const groups = (app: Application) => {
       all: [schemaHooks.validateQuery(groupsQueryValidator), schemaHooks.resolveQuery(groupsQueryResolver)],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(groupsDataValidator), schemaHooks.resolveData(groupsDataResolver)],
+      create: [
+        schemaHooks.validateData(groupsDataValidator),
+        schemaHooks.resolveData(groupsDataResolver),
+        async (context: HookContext) => {
+          const { data, app } = context
+          if (!data.type) {
+            data.type = 'group'
+            context.data = data
+          }
+
+          return context
+        }
+      ],
       patch: [schemaHooks.validateData(groupsPatchValidator), schemaHooks.resolveData(groupsPatchResolver)],
       remove: []
     },
