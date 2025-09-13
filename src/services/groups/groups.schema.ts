@@ -11,7 +11,7 @@ import type { GroupsService } from './groups.class'
 // Main data model schema
 export const groupsSchema = Type.Object(
   {
-    _id: ObjectIdSchema(),
+    _id: Type.String(),
     name: Type.String()
   },
   { $id: 'Groups', additionalProperties: false }
