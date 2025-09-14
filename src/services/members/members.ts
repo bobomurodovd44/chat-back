@@ -18,7 +18,7 @@ import type { Application } from '../../declarations'
 import { MembersService, getOptions } from './members.class'
 import { membersPath, membersMethods } from './members.shared'
 import { HookContext } from '@feathersjs/feathers'
-import { BadRequest } from '@feathersjs/errors'
+import { BadRequest, NotFound } from '@feathersjs/errors'
 
 export * from './members.class'
 export * from './members.schema'
@@ -73,7 +73,30 @@ export const members = (app: Application) => {
         }
       ],
       patch: [schemaHooks.validateData(membersPatchValidator), schemaHooks.resolveData(membersPatchResolver)],
-      remove: []
+      remove: [
+        async (context: HookContext) => {
+          const { app, id } = context
+
+          if (!id) {
+            throw new BadRequest("Id bo'lishi shart")
+          }
+
+          let member
+          try {
+            member = await app.service('members').get(id)
+          } catch (error) {
+            throw new NotFound('Bunaqa Member Mavjud Emas')
+          }
+
+          await app.service('messages').remove(null, {
+            query: {
+              chatId: member._id
+            }
+          })
+
+          return context
+        }
+      ]
     },
     after: {
       all: []
