@@ -15,7 +15,13 @@ export const userSchema = Type.Object(
     _id: ObjectIdSchema(),
     email: Type.String(),
     password: Type.String(),
-    fullName: Type.String()
+    fullName: Type.String(),
+    username: Type.String({
+      minLength: 3,
+      maxLength: 30,
+      pattern: '[a-z](?=.*[a-z])[a-z0-9_]*$', // faqat kichik harflar
+      description: 'Username must be lowercase letters only'
+    })
   },
   { $id: 'User', additionalProperties: false }
 )
@@ -29,7 +35,7 @@ export const userExternalResolver = resolve<User, HookContext<UserService>>({
 })
 
 // Schema for creating new entries
-export const userDataSchema = Type.Pick(userSchema, ['email', 'password', 'fullName'], {
+export const userDataSchema = Type.Pick(userSchema, ['email', 'password', 'fullName', 'username'], {
   $id: 'UserData'
 })
 export type UserData = Static<typeof userDataSchema>
@@ -49,7 +55,7 @@ export const userPatchResolver = resolve<User, HookContext<UserService>>({
 })
 
 // Schema for allowed query properties
-export const userQueryProperties = Type.Pick(userSchema, ['_id', 'email', 'fullName'])
+export const userQueryProperties = Type.Pick(userSchema, ['_id', 'email', 'fullName', 'username'])
 export const userQuerySchema = Type.Intersect(
   [
     querySyntax(userQueryProperties),

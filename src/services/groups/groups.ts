@@ -18,6 +18,7 @@ import type { Application } from '../../declarations'
 import { GroupsService, getOptions } from './groups.class'
 import { groupsPath, groupsMethods } from './groups.shared'
 import { HookContext } from '@feathersjs/feathers'
+import { BadRequest, NotFound } from '@feathersjs/errors'
 
 export * from './groups.class'
 export * from './groups.schema'
@@ -58,7 +59,32 @@ export const groups = (app: Application) => {
         }
       ],
       patch: [schemaHooks.validateData(groupsPatchValidator), schemaHooks.resolveData(groupsPatchResolver)],
-      remove: []
+      remove: [
+        async (context: HookContext) => {
+          const { app, id } = context
+
+          if (!id) {
+            throw new BadRequest("Id bo'lishi shart")
+          }
+
+          // Guruhni olish va xatoni custom qilish
+          let chat
+          try {
+            chat = await app.service('groups').get(id)
+          } catch (error) {
+            throw new NotFound('Bunaqa Chat Mavjud Emas')
+          }
+
+          // Chat mavjud bo‘lsa, unga tegishli message-larni o‘chirish
+          await app.service('messages').remove(null, {
+            query: {
+              chatId: chat._id
+            }
+          })
+
+          return context
+        }
+      ]
     },
     after: {
       all: []

@@ -8,19 +8,20 @@ import type { Message, MessageData, MessagePatch, MessageQuery } from './message
 
 export type { Message, MessageData, MessagePatch, MessageQuery }
 
-export interface MessageParams extends MongoDBAdapterParams<MessageQuery> { }
+export interface MessageParams extends MongoDBAdapterParams<MessageQuery> {}
 
 // By default calls the standard MongoDB adapter service methods but can be customized with your own functionality.
 export class MessageService<ServiceParams extends Params = MessageParams> extends MongoDBService<
-    Message,
-    MessageData,
-    MessageParams,
-    MessagePatch
-> { }
+  Message,
+  MessageData,
+  MessageParams,
+  MessagePatch
+> {}
 
 export const getOptions = (app: Application): MongoDBAdapterOptions => {
-    return {
-        paginate: app.get('paginate'),
-        Model: app.get('mongodbClient').then(db => db.collection('messages'))
-    }
+  return {
+    paginate: app.get('paginate'),
+    Model: app.get('mongodbClient').then(db => db.collection('messages')),
+    multi: true
+  }
 }

@@ -17,6 +17,8 @@ import {
 import type { Application } from '../../declarations'
 import { UserService, getOptions } from './users.class'
 import { userPath, userMethods } from './users.shared'
+import { HookContext } from '@feathersjs/feathers'
+import { Conflict } from '@feathersjs/errors'
 
 export * from './users.class'
 export * from './users.schema'
@@ -45,7 +47,22 @@ export const user = (app: Application) => {
       all: [schemaHooks.validateQuery(userQueryValidator), schemaHooks.resolveQuery(userQueryResolver)],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(userDataValidator), schemaHooks.resolveData(userDataResolver)],
+      create: [
+        schemaHooks.validateData(userDataValidator),
+        schemaHooks.resolveData(userDataResolver),
+        async (context: HookContext) => {
+          const { data, app } = context
+          if (data.username) {
+            const existing = await app.service('users').find({
+              query: { username: data.username }
+            })
+            if ((existing as any).total > 0) {
+              throw new Conflict('Username already exists')
+            }
+          }
+          return context
+        }
+      ],
       patch: [schemaHooks.validateData(userPatchValidator), schemaHooks.resolveData(userPatchResolver)],
       remove: []
     },
