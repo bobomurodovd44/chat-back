@@ -21,6 +21,7 @@ export class MembersService<ServiceParams extends Params = MembersParams> extend
 export const getOptions = (app: Application): MongoDBAdapterOptions => {
   return {
     paginate: app.get('paginate'),
-    Model: app.get('mongodbClient').then(db => db.collection('members'))
+    Model: app.get('mongodbClient').then(db => db.collection('members')),
+    multi: true
   }
 }

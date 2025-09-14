@@ -82,6 +82,12 @@ export const groups = (app: Application) => {
             }
           })
 
+          await app.service('members').remove(null, {
+            query: {
+              chatId: chat._id
+            }
+          })
+
           return context
         }
       ]
