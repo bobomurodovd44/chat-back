@@ -17,6 +17,10 @@ export const messageSchema = Type.Object(
     text: Type.String(),
     senderId: ObjectIdSchema(),
     chatId: ObjectIdSchema(),
+    fileUrl: Type.Optional(Type.String()),
+    fileType: Type.Optional(Type.String()),
+    fileSize: Type.Optional(Type.Number()),
+    fileName: Type.Optional(Type.String()),
     senderEmail: Type.Optional(Type.String()),
     senderUserId: Type.Optional(Type.String()),
     senderFullName: Type.Optional(Type.String()),
@@ -27,17 +31,29 @@ export const messageSchema = Type.Object(
 )
 export type Message = Static<typeof messageSchema>
 export const messageValidator = getValidator(messageSchema, dataValidator)
-export const messageResolver = resolve<Message, HookContext<MessageService>>({})
+export const messageResolver = resolve<Message, HookContext<MessageService>>({
+  _id: async value => value?.toString(),
+  senderId: async value => value?.toString(),
+  chatId: async value => value?.toString()
+})
 
 export const messageExternalResolver = resolve<Message, HookContext<MessageService>>({})
 
 // Schema for creating new entries
-export const messageDataSchema = Type.Pick(messageSchema, ['text', 'senderId', 'chatId'], {
-  $id: 'MessageData'
-})
+export const messageDataSchema = Type.Pick(
+  messageSchema,
+  ['text', 'senderId', 'chatId', 'fileUrl', 'fileSize', 'fileName', 'fileType'],
+  {
+    $id: 'MessageData'
+  }
+)
 export type MessageData = Static<typeof messageDataSchema>
 export const messageDataValidator = getValidator(messageDataSchema, dataValidator)
 export const messageDataResolver = resolve<Message, HookContext<MessageService>>({
+  _id: async value => value?.toString(),
+  senderId: async value => value?.toString(),
+  chatId: async value => value?.toString(),
+
   createdAt: async () => Date.now(),
   updatedAt: async () => Date.now()
 })

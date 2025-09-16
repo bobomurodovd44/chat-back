@@ -67,26 +67,25 @@ export const groups = (app: Application) => {
             throw new BadRequest("Id bo'lishi shart")
           }
 
-          // Guruhni olish va xatoni custom qilish
+          // Guruhni olish
           let chat
           try {
-            chat = await app.service('groups').get(id)
+            chat = await context.service.get(id)
           } catch (error) {
             throw new NotFound('Bunaqa Chat Mavjud Emas')
           }
 
-          // Chat mavjud bo‘lsa, unga tegishli message-larni o‘chirish
+          // Avval unga bog‘langan message’larni o‘chirish
           await app.service('messages').remove(null, {
-            query: {
-              chatId: chat._id
-            }
+            query: { chatId: chat._id }
           })
 
+          // Keyin unga bog‘langan member’larni o‘chirish
           await app.service('members').remove(null, {
-            query: {
-              chatId: chat._id
-            }
+            query: { chatId: chat._id }
           })
+
+          // Oxirida group’ni o‘zi o‘chiriladi (Feathers default remove bajaradi)
 
           return context
         }

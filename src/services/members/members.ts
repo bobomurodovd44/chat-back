@@ -73,30 +73,7 @@ export const members = (app: Application) => {
         }
       ],
       patch: [schemaHooks.validateData(membersPatchValidator), schemaHooks.resolveData(membersPatchResolver)],
-      remove: [
-        async (context: HookContext) => {
-          const { app, id } = context
-
-          if (!id) {
-            throw new BadRequest("Id bo'lishi shart")
-          }
-
-          let member
-          try {
-            member = await app.service('members').get(id)
-          } catch (error) {
-            throw new NotFound('Bunaqa Member Mavjud Emas')
-          }
-
-          await app.service('messages').remove(null, {
-            query: {
-              chatId: member._id
-            }
-          })
-
-          return context
-        }
-      ]
+      remove: []
     },
     after: {
       all: []

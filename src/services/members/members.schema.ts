@@ -12,17 +12,25 @@ import type { MembersService } from './members.class'
 export const membersSchema = Type.Object(
   {
     _id: ObjectIdSchema(),
-    chatId: Type.String(),
-    userId: Type.String(),
+    chatId: ObjectIdSchema(),
+    userId: ObjectIdSchema(),
     role: Type.Optional(Type.Union([Type.Literal('owner'), Type.Literal('member')]))
   },
   { $id: 'Members', additionalProperties: false }
 )
 export type Members = Static<typeof membersSchema>
 export const membersValidator = getValidator(membersSchema, dataValidator)
-export const membersResolver = resolve<Members, HookContext<MembersService>>({})
+export const membersResolver = resolve<Members, HookContext<MembersService>>({
+  _id: async value => value?.toString(),
+  chatId: async value => value?.toString(),
+  userId: async value => value?.toString()
+})
 
-export const membersExternalResolver = resolve<Members, HookContext<MembersService>>({})
+export const membersExternalResolver = resolve<Members, HookContext<MembersService>>({
+  _id: async value => value?.toString(),
+  chatId: async value => value?.toString(),
+  userId: async value => value?.toString()
+})
 
 // Schema for creating new entries
 export const membersDataSchema = Type.Pick(membersSchema, ['chatId', 'userId', 'role'], {

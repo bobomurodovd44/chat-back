@@ -58,7 +58,14 @@
     "@feathersjs/socketio": "^5.0.35",
     "@feathersjs/transport-commons": "^5.0.35",
     "@feathersjs/typebox": "^5.0.35",
+    "@types/koa-mount": "^4.0.5",
+    "@types/multer": "^2.0.0",
+    "express": "^5.1.0",
+    "koa-connect": "^2.1.0",
+    "koa-mount": "^4.2.0",
     "mongodb": "^6.19.0",
+    "mongoose": "^8.18.1",
+    "multer": "^2.0.2",
     "winston": "^3.17.0"
   },
   "devDependencies": {

@@ -11,7 +11,7 @@ import type { GroupsService } from './groups.class'
 // Main data model schema
 export const groupsSchema = Type.Object(
   {
-    _id: Type.String(),
+    _id: ObjectIdSchema(),
     name: Type.Optional(Type.String()),
     type: Type.Optional(Type.Union([Type.Literal('private'), Type.Literal('group')]))
   },
@@ -19,9 +19,13 @@ export const groupsSchema = Type.Object(
 )
 export type Groups = Static<typeof groupsSchema>
 export const groupsValidator = getValidator(groupsSchema, dataValidator)
-export const groupsResolver = resolve<Groups, HookContext<GroupsService>>({})
+export const groupsResolver = resolve<Groups, HookContext<GroupsService>>({
+  _id: async value => value?.toString()
+})
 
-export const groupsExternalResolver = resolve<Groups, HookContext<GroupsService>>({})
+export const groupsExternalResolver = resolve<Groups, HookContext<GroupsService>>({
+  _id: async value => value?.toString()
+})
 
 // Schema for creating new entries
 export const groupsDataSchema = Type.Pick(groupsSchema, ['name', 'type'], {
