@@ -16,6 +16,7 @@ import { services } from './services/index'
 import { channels } from './channels'
 import multer from 'multer'
 import path from 'path'
+import fs from 'fs'
 
 const app: Application = koa(feathers())
 
@@ -43,8 +44,14 @@ app.configure(authentication)
 app.configure(services)
 app.configure(channels)
 
-app.use(mount('/uploads', serveStatic(path.join(__dirname, '../uploads'))))
+const uploadsPath = path.resolve(__dirname, '..', 'uploads')
 
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true })
+}
+
+// static qilib ulash
+app.use(mount('/uploads', serveStatic(uploadsPath)))
 // ✅ Express app yaratish
 const expressApp = express()
 
@@ -54,15 +61,36 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname)
   }
 })
-const upload = multer({ storage })
+
+const allowedTypes = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'application/pdf',
+  'audio/mpeg', // mp3
+  'audio/wav', // wav
+  'audio/ogg' // ogg
+]
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (!allowedTypes.includes(file.mimetype)) {
+      return cb(new Error('Faqat JPG, PNG, GIF, PDF va audio fayllarga ruxsat beriladi!'))
+    }
+    cb(null, true)
+  },
+  limits: {
+    fileSize: 20 * 1024 * 1024 // 20 MB max (audio uchun biroz katta)
+  }
+})
 
 // ✅ Upload route
 expressApp.post('/upload', upload.single('file'), (req, res) => {
   const file = req.file
   if (!file) return res.status(400).send('No file uploaded')
 
-  res.json({
-    fileUrl: `/uploads/${file.filename}`,
+  res.status(201).json({
+    fileUrl: `http://localhost:3030/uploads/${file.filename}`,
     fileName: file.originalname,
     fileSize: file.size,
     fileType: file.mimetype
@@ -70,7 +98,7 @@ expressApp.post('/upload', upload.single('file'), (req, res) => {
 })
 
 // Feathers Koa app ichiga Expressni ulash
-app.use(mount('/express', convert(expressApp)))
+app.use(mount('/express', convert(expressApp as any)))
 
 // Register hooks that run on all service methods
 app.hooks({

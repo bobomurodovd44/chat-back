@@ -13,10 +13,10 @@ import { userSchema } from '../users/users.schema'
 // Main data model schema
 export const messageSchema = Type.Object(
   {
-    _id: ObjectIdSchema(),
-    text: Type.String(),
-    senderId: ObjectIdSchema(),
-    chatId: ObjectIdSchema(),
+    _id: Type.String(),
+    text: Type.Optional(Type.String()),
+    senderId: Type.String(),
+    chatId: Type.String(),
     fileUrl: Type.Optional(Type.String()),
     fileType: Type.Optional(Type.String()),
     fileSize: Type.Optional(Type.Number()),
@@ -31,11 +31,7 @@ export const messageSchema = Type.Object(
 )
 export type Message = Static<typeof messageSchema>
 export const messageValidator = getValidator(messageSchema, dataValidator)
-export const messageResolver = resolve<Message, HookContext<MessageService>>({
-  _id: async value => value?.toString(),
-  senderId: async value => value?.toString(),
-  chatId: async value => value?.toString()
-})
+export const messageResolver = resolve<Message, HookContext<MessageService>>({})
 
 export const messageExternalResolver = resolve<Message, HookContext<MessageService>>({})
 
@@ -50,10 +46,6 @@ export const messageDataSchema = Type.Pick(
 export type MessageData = Static<typeof messageDataSchema>
 export const messageDataValidator = getValidator(messageDataSchema, dataValidator)
 export const messageDataResolver = resolve<Message, HookContext<MessageService>>({
-  _id: async value => value?.toString(),
-  senderId: async value => value?.toString(),
-  chatId: async value => value?.toString(),
-
   createdAt: async () => Date.now(),
   updatedAt: async () => Date.now()
 })
