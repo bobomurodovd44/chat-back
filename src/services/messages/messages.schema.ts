@@ -13,10 +13,10 @@ import { userSchema } from '../users/users.schema'
 // Main data model schema
 export const messageSchema = Type.Object(
   {
-    _id: Type.String(),
+    _id: ObjectIdSchema(),
     text: Type.Optional(Type.String()),
-    senderId: Type.String(),
-    chatId: Type.String(),
+    senderId: ObjectIdSchema(),
+    chatId: ObjectIdSchema(),
     fileUrl: Type.Optional(Type.String()),
     fileType: Type.Optional(Type.String()),
     fileSize: Type.Optional(Type.Number()),

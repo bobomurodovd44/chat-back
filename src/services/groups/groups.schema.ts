@@ -11,7 +11,7 @@ import type { GroupsService } from './groups.class'
 // Main data model schema
 export const groupsSchema = Type.Object(
   {
-    _id: Type.String(),
+    _id: ObjectIdSchema(),
     name: Type.Optional(Type.String()),
     type: Type.Optional(Type.Union([Type.Literal('private'), Type.Literal('group')]))
   },

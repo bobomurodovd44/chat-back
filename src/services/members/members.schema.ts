@@ -11,9 +11,9 @@ import type { MembersService } from './members.class'
 // Main data model schema
 export const membersSchema = Type.Object(
   {
-    _id: Type.String(),
-    chatId: Type.String(),
-    userId: Type.String(),
+    _id: ObjectIdSchema(),
+    chatId: ObjectIdSchema(),
+    userId: ObjectIdSchema(),
     role: Type.Optional(Type.Union([Type.Literal('owner'), Type.Literal('member')]))
   },
   { $id: 'Members', additionalProperties: false }
